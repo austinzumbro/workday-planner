@@ -1,11 +1,11 @@
-// {/* <div id="hour-9" class="row time-block past">
-//   <div class="col-2 col-md-1 hour text-center py-3">9AM</div>
-//   <textarea class="col-8 col-md-10 description" rows="3">
-//   </textarea>
-//   <button class="btn saveBtn col-2 col-md-1" aria-label="save">
-//     <i class="fas fa-save" aria-hidden="true"></i>
-//   </button>
-// </div>; */}
+function retrieveText(key) {
+  let response = localStorage.getItem(key);
+  if (response) {
+    return response;
+  } else {
+    return "";
+  }
+}
 
 // Wrap all code that interacts with the DOM in a call to jQuery to ensure that
 // the code isn't run until the browser has finished rendering all the elements
@@ -29,16 +29,17 @@ $(function () {
   // attribute of each time-block be used to do this?
   //
   // TODO: Add code to display the current date in the header of the page.
+
+  // Grab elements in the HTML doc
   const mainSection = $("#main-section");
   const currentDayP = $("#currentDay");
 
+  // Declare time variables
   let currentHour = dayjs().hour();
   let currentDay = dayjs();
   let currentDayInt = dayjs().day();
+  // Format the current day
   let dayText = dayjs(currentDay).format("dddd, MMMM d");
-  let workdayStart = 9;
-  let workdayEnd = 18;
-
   if (currentDayInt == 1 || currentDayInt == 21 || currentDayInt == 31) {
     dayText += "st";
   } else if (currentDayInt == 2 || currentDayInt == 22) {
@@ -48,50 +49,64 @@ $(function () {
   } else {
     dayText += "th";
   }
-
+  // Append that text to the relevant HTML element
   currentDayP.text(dayText);
-  console.log(currentDayInt);
 
-  function init() {
-    for (let i = workdayStart; i < workdayEnd; i++) {
-      let time = dayjs().hour(i).format("hA");
-      let divRow = $("<div>", {
-        id: "hour-" + i,
-        class: "row time-block",
-      });
+  // Declare variables relevant to the construction of the scheduler
+  let workdayStart = 9;
+  let workdayEnd = 18;
 
-      if (currentHour > i) {
-        divRow.addClass("past");
-      } else if (currentHour == i) {
-        divRow.addClass("present");
-      } else {
-        divRow.addClass("future");
-      }
-
-      let timeCol = $("<div>", {
-        class: "col-2 col-md-1 hour text-center py-3",
-      });
-      timeCol.text(time);
-      let textCol = $("<textarea>", {
-        class: "col-8 col-md-10 description",
-        rows: "3",
-      });
-      let buttonCol = $("<button>", {
-        class: "btn saveBtn col-2 col-md-1",
-        ariaLabel: "save",
-      });
-      buttonCol.append(
-        $("<i>", {
-          class: "fas fa-save",
-          ariaHidden: "true",
-        })
-      );
-      divRow.append(timeCol);
-      divRow.append(textCol);
-      divRow.append(buttonCol);
-      mainSection.append(divRow);
+  // Construct the scheduler
+  for (let i = workdayStart; i < workdayEnd; i++) {
+    let time = dayjs().hour(i).format("hA");
+    let divRow = $("<div>", {
+      id: "hour-" + i,
+      class: "row time-block",
+    });
+    // Apply classes based on current time
+    if (currentHour > i) {
+      divRow.addClass("past");
+    } else if (currentHour == i) {
+      divRow.addClass("present");
+    } else {
+      divRow.addClass("future");
     }
+
+    let timeCol = $("<div>", {
+      class: "col-2 col-md-1 hour text-center py-3",
+    });
+    timeCol.text(time);
+
+    let textCol = $("<textarea>", {
+      class: "col-8 col-md-10 description",
+      rows: "3",
+    });
+
+    let storedText = retrieveText("hour-" + i);
+    textCol.text(storedText);
+
+    let buttonCol = $("<button>", {
+      class: "btn saveBtn col-2 col-md-1",
+      ariaLabel: "save",
+    });
+    buttonCol.append(
+      $("<i>", {
+        class: "fas fa-save",
+        ariaHidden: "true",
+      })
+    );
+    divRow.append(timeCol);
+    divRow.append(textCol);
+    divRow.append(buttonCol);
+    mainSection.append(divRow);
   }
 
-  init();
+  $("button").on("click", function () {
+    let parentRow = $(this).parent();
+    let rowID = parentRow[0].id;
+    let textarea = parentRow.children("textarea");
+    let textAreaContent = textarea[0].value;
+
+    localStorage.setItem(rowID, textAreaContent);
+  });
 });
