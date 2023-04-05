@@ -13,11 +13,11 @@ $(function () {
   const currentDayP = $("#currentDay");
 
   // Declare time variables
-  let currentHour = dayjs().hour();
   let currentDay = dayjs();
-  let currentDayInt = dayjs().day();
+  let currentHour = currentDay.hour();
+  let currentDayInt = currentDay.date();
   // Format the current day
-  let dayText = dayjs(currentDay).format("dddd, MMMM d");
+  let dayText = currentDay.format("dddd, MMMM D");
   if (currentDayInt == 1 || currentDayInt == 21 || currentDayInt == 31) {
     dayText += "st";
   } else if (currentDayInt == 2 || currentDayInt == 22) {
