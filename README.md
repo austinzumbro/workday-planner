@@ -53,7 +53,7 @@ for (let i = workdayStart; i < workdayEnd; i++) {
 
 I'm highlighting this section because it features two of my new favorite things about JQuery.
 
-1. The `$("<element>", {object})` syntax is very easy to write, and much less confusing to parse and edit when I inevitably want to make changes.
+1. The `$("<element>", {object})` syntax is very easy to write and much less confusing to parse and edit when I inevitably want to make changes.
 2. It's really handy to simply use the `.addClass` method to add a class(!), as opposed to overwriting the whole thing with `.setAttribute('class', 'new-class old-clas-that-was-working-but-now-has-a-typo-in-it')`
 
 In those if/else statements, you can also see I applied some classes based on the current hour whenever the user loads the application. Which is a great segue into talking about Day.js.
