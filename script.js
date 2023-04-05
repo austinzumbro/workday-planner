@@ -7,29 +7,7 @@ function retrieveText(key) {
   }
 }
 
-// Wrap all code that interacts with the DOM in a call to jQuery to ensure that
-// the code isn't run until the browser has finished rendering all the elements
-// in the html.
 $(function () {
-  // TODO: Add a listener for click events on the save button. This code should
-  // use the id in the containing time-block as a key to save the user input in
-  // local storage. HINT: What does `this` reference in the click listener
-  // function? How can DOM traversal be used to get the "hour-x" id of the
-  // time-block containing the button that was clicked? How might the id be
-  // useful when saving the description in local storage?
-  //
-  // TODO: Add code to apply the past, present, or future class to each time
-  // block by comparing the id to the current hour. HINTS: How can the id
-  // attribute of each time-block be used to conditionally add or remove the
-  // past, present, and future classes? How can Day.js be used to get the
-  // current hour in 24-hour time?
-  //
-  // TODO: Add code to get any user input that was saved in localStorage and set
-  // the values of the corresponding textarea elements. HINT: How can the id
-  // attribute of each time-block be used to do this?
-  //
-  // TODO: Add code to display the current date in the header of the page.
-
   // Grab elements in the HTML doc
   const mainSection = $("#main-section");
   const currentDayP = $("#currentDay");
@@ -59,6 +37,8 @@ $(function () {
   // Construct the scheduler
   for (let i = workdayStart; i < workdayEnd; i++) {
     let time = dayjs().hour(i).format("hA");
+
+    // Construct the parent "hour" row
     let divRow = $("<div>", {
       id: "hour-" + i,
       class: "row time-block",
@@ -72,19 +52,30 @@ $(function () {
       divRow.addClass("future");
     }
 
+    // Construct the child column displaying the hour
     let timeCol = $("<div>", {
       class: "col-2 col-md-1 hour text-center py-3",
     });
     timeCol.text(time);
 
+    // Construct the text column
     let textCol = $("<textarea>", {
       class: "col-8 col-md-10 description",
       rows: "3",
     });
 
+    // Retrieve any stored text from localStorage and fill the textarea
     let storedText = retrieveText("hour-" + i);
-    textCol.text(storedText);
+    textCol[0].value = storedText;
+    // textCol.text(storedText);
+    // ^^^^^^^^^^^^^^^^^^^^^^^
+    // The code above was how I initally filled the field.
+    // However, because we use to use the "value" property to retrieve
+    // a textarea's contents, it seemed like a good idea to use the same
+    // method to fill the textarea on page load. However, switching
+    // between the two doesn't seem to reveal any practical difference.
 
+    // Construct the button column
     let buttonCol = $("<button>", {
       class: "btn saveBtn col-2 col-md-1",
       ariaLabel: "save",
@@ -95,12 +86,18 @@ $(function () {
         ariaHidden: "true",
       })
     );
+
+    // Append all the columns to the row
     divRow.append(timeCol);
     divRow.append(textCol);
     divRow.append(buttonCol);
+
+    // Append the row to the main section tag
     mainSection.append(divRow);
   }
 
+  // On click, get the ID of the parent row and use it to store the
+  // relevant textarea contents to localStorage for later use.
   $("button").on("click", function () {
     let parentRow = $(this).parent();
     let rowID = parentRow[0].id;
